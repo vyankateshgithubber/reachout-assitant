@@ -1,7 +1,7 @@
 import os
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from PyPDF2 import PdfReader
 from docx import Document
@@ -22,7 +22,7 @@ app.add_middleware(
 )
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
-app.mount("/", StaticFiles(directory="templates", html=True), name="frontend")
+app.mount("/app", StaticFiles(directory="templates", html=True), name="frontend")
 
 resume_text = ""
 
@@ -89,3 +89,8 @@ Tone: {tone}
         return {"message": message}
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
+
+
+@app.get("/")
+def read_index():
+    return FileResponse("templates/index.html")
