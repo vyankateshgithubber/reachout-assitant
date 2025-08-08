@@ -1,0 +1,174 @@
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <title>LinkedIn Outreach Assistant</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f7fa;
+      color: #333;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background-color: #fff;
+      padding: 30px 40px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #0073b1;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 20px;
+    }
+
+    input[type="file"],
+    select,
+    textarea,
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #0073b1;
+      color: white;
+      border: none;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #005a8d;
+    }
+
+    #upload-status {
+      margin-top: 10px;
+      font-size: 14px;
+      color: green;
+    }
+
+    #result {
+      background-color: #f0f2f5;
+      border-left: 4px solid #0073b1;
+      padding: 15px;
+      margin-top: 25px;
+      white-space: pre-wrap;
+      border-radius: 5px;
+      font-size: 15px;
+    }
+
+    @media screen and (max-width: 600px) {
+      .container {
+        padding: 20px;
+        margin: 20px;
+      }
+    }
+  </style>
+<script id="simplify-jobs-page-script" src="chrome-extension://pbanhockgagggenencehbnadejlgchfc/js/pageScript.bundle.js"></script></head>
+<body>
+  <div class="container">
+    <h1>LinkedIn Outreach Assistant</h1>
+
+    <label>Upload Your Resume (PDF or DOCX):</label>
+    <input type="file" id="resume" accept=".pdf,.docx">
+    <button onclick="uploadResume()">Upload Resume</button>
+    <div id="upload-status" style="color: green;">Resume uploaded and parsed successfully.</div>
+
+    <form id="message-form">
+      <label>Message Type:</label>
+      <select name="message_type">
+        <option value="Referral Request">Referral Request</option>
+        <option value="Job Application Intro">Job Application Intro</option>
+        <option value="Recruiter Message">Recruiter Message</option>
+      </select>
+
+      <label>Tone:</label>
+      <select name="tone">
+        <option value="Professional">Professional</option>
+        <option value="Friendly">Friendly</option>
+        <option value="Concise">Concise</option>
+      </select>
+
+      <label>Target Profile (Optional):</label>
+      <textarea name="target_profile" rows="4" placeholder="Paste LinkedIn bio or job title of the person you're messaging..."></textarea>
+
+      <button type="submit">Generate Message</button>
+    </form>
+
+    <div id="result" style="display: block;">Here are a few options for a personalized LinkedIn outreach message, ranging slightly in directness, based on Vyankatesh's impressive resume. Remember to replace the bracketed placeholders `[ ]` with specific information.<br><br>---<br><br>**Option 1: Direct &amp; Concise**<br><br>**Subject Line (if sending an InMail):** Referral Request - Senior Software Engineer | Azure &amp; .NET Core Expertise<br><br>**Message:**<br><br>Hi [Name of Person],<br><br>I hope this message finds you well.<br><br>I'm reaching out as I'm highly impressed by [Company Name]'s innovative work in [mention a specific area/tech you admire about their company, e.g., "cloud-native solutions," "fintech innovation," "scalable platforms"] and was hoping you might be open to a referral for Senior Software Engineer roles.<br><br>With over two years as a Senior Software Engineer at Bajaj Finance Ltd., I've specialized in full-stack development with .NET Core and Angular, leading impactful Azure cloud migrations (e.g., reducing infrastructure costs by 35%) and architecting scalable solutions like microfrontends. My experience also includes significant performance optimization (e.g., 40% memory utilization improvement) and ensuring high system uptime.<br><br>I believe my background in enterprise-grade system design, cloud DevOps (Azure), and building robust, scalable applications aligns well with the challenges at [Company Name].<br><br>Would you be available for a brief 10-15 minute chat sometime next week to discuss how my skills might fit current openings? My LinkedIn profile is linked below for your review.<br><br>Thank you for your time and consideration.<br><br>Best regards,<br><br>Vyankatesh Goski<br>linkedin.com/in/vyankatesh-goski/<br><br>---<br><br>**Option 2: Slightly More Detail on Impact**<br><br>**Subject Line (if sending an InMail):** Senior Software Engineer seeking Referral | Azure, .NET Core, Microservices<br><br>**Message:**<br><br>Hi [Name of Person],<br><br>I'm writing to you today as I've been following [Company Name]'s impressive contributions to [mention a specific industry or tech area, e.g., "transformative digital solutions," "data-driven platforms"] and am very keen on exploring opportunities there. I was hoping you might be open to a referral.<br><br>As a Senior Software Engineer at Bajaj Finance Ltd., I have a strong track record in delivering high-impact projects. For instance, I spearheaded the migration of 4+ microservices from VM to Azure App Service in .NET Core 6, reducing infrastructure costs by 35%. I also led a POC on Angular Module Federation, driving the adoption of Microfrontend Architecture and reducing code duplication by 50%. My expertise spans full-stack development, enterprise-level system design, and performance optimization.<br><br>I'm particularly enthusiastic about [Company Name]'s approach to [mention something specific, e.g., "cloud architecture," "developer experience," "problem-solving"] and am confident my experience in Azure, .NET Core, Angular, and building scalable systems (including ensuring 99.9% system uptime) would be a valuable asset.<br><br>Would you be open to a quick call to discuss potential Senior Software Engineer roles and see if my profile aligns with your team's needs? My full resume and LinkedIn profile are available for your review.<br><br>Thank you for your time.<br><br>Sincerely,<br><br>Vyankatesh Goski<br>linkedin.com/in/vyankatesh-goski/<br><br>---<br><br>**Option 3: For a specific role (if you know it)**<br><br>**Subject Line (if sending an InMail):** Referral for [Job Title] - Vyankatesh Goski | Azure &amp; Full-Stack<br><br>**Message:**<br><br>Hi [Name of Person],<br><br>I hope you're having a good week.<br><br>I'm reaching out as I recently came across the [Job Title] role at [Company Name] and was immediately drawn to it, particularly [mention something specific about the role that appeals to you, e.g., "the focus on microservices and cloud scalability"]. Given your position, I was hoping you might be open to discussing a potential referral.<br><br>My two years as a Senior Software Engineer at Bajaj Finance Ltd. have provided me with comprehensive experience directly relevant to this role. I have a proven ability to lead complex initiatives like migrating critical systems to Azure App Service (resulting in 35% cost reduction) and implementing architectural improvements such as Angular Module Federation for microfrontends. My work also includes building robust .NET Core web applications, integrating advanced authentication systems, and optimizing data retrieval from Azure Data Lake.<br><br>I'm confident that my skills in .NET Core, Angular, Azure DevOps, system design, and problem-solving align perfectly with the requirements of the [Job Title] position.<br><br>Would you be available for a brief chat to explore this opportunity further? I've attached my resume and my LinkedIn profile is linked below for your convenience.<br><br>Thank you for your consideration.<br><br>Best regards,<br><br>Vyankatesh Goski<br>linkedin.com/in/vyankatesh-goski/<br><br>---<br><br>**Key things to remember before sending:**<br><br>1.  **Personalize the `[Name of Person]` and `[Company Name]`**.<br>2.  **Research the company:** Find something specific about their work, culture, or recent projects that genuinely interests you and plug it into `[mention a specific area/tech you admire about their company]`. This shows you've done your homework.<br>3.  **Check for specific job openings:** If you know of a particular role, tailor the message (like Option 3). If not, keep it general but express interest in relevant positions.<br>4.  **Keep it concise:** LinkedIn messages are often read on mobile, so brevity is key.<br>5.  **Professionalism:** Maintain a respectful and professional tone.<br>6.  **Your LinkedIn Profile:** Ensure your LinkedIn profile is up-to-date and mirrors your resume.</div>
+  </div>
+
+  <script>
+    async function uploadResume() {
+      const fileInput = document.getElementById('resume');
+      const status = document.getElementById('upload-status');
+      const file = fileInput.files[0];
+
+      if (!file) {
+        status.innerText = "Please select a file to upload.";
+        status.style.color = "red";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      status.innerText = "Uploading...";
+      status.style.color = "gray";
+
+      try {
+        const response = await fetch("/upload-resume", {
+          method: "POST",
+          body: formData,
+        });
+        const result = await response.json();
+
+        if (result.message) {
+          status.innerText = result.message;
+          status.style.color = "green";
+        } else {
+          status.innerText = result.error;
+          status.style.color = "red";
+        }
+      } catch (err) {
+        status.innerText = "Upload failed. Try again.";
+        status.style.color = "red";
+      }
+    }
+
+    document.getElementById("message-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const resultBox = document.getElementById("result");
+
+      resultBox.style.display = "block";
+      resultBox.innerText = "Generating message...";
+
+      const res = await fetch("/generate-message", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      resultBox.innerText = data.message || data.error;
+    });
+  </script>
+
+
+</body></html>
