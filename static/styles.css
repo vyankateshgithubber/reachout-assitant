@@ -19,7 +19,7 @@ label {
   margin-top: 10px;
 }
 
-input[type="file"],
+input,
 select,
 textarea {
   width: 100%;

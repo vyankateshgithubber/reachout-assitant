@@ -4,17 +4,78 @@
   <meta charset="UTF-8" />
   <title>LinkedIn Outreach Assistant</title>
   <link rel="stylesheet" href="/static/styles.css" />
+  <style>
+    #copyBtn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      margin-left: 0.5em;
+      font-size: 1.3em;
+      color: #555;
+      transition: color 0.2s;
+      position: absolute;
+      right: -0.5em;
+      top: -1.5em;
+      z-index: 2;
+    }
+    #copyBtn:hover {
+      color: #0072b1;
+    }
+    #output-container {
+      position: relative;
+      margin-top: 1em;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    #output {
+      padding: 1em;
+      background: #f8f8f8;
+      border-radius: 6px;
+      font-family: "Segoe UI", "Liberation Sans", Arial, sans-serif;
+      min-height: 2em;
+      max-width: 100%;
+      overflow-x: auto;
+      white-space: normal;
+      word-break: break-word;
+    }
+    #output p {
+      margin: 0.5em 0;
+    }
+    #output > *:first-child { margin-top: 0; }
+    #output > *:last-child { margin-bottom: 0; }
+    .spinner {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      border: 2px solid #ccc;
+      border-top: 2px solid #0072b1;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>LinkedIn Outreach Assistant</h1>
     <form id="resumeForm">
-      <label>Upload Your Resume (PDF/DOCX):</label>
-      <input type="file" name="file" required />
-      <button type="submit">Upload</button>
+      <label>Resume:</label>
+      <select id="resumeSelect" name="resume_id">
+        <option value="">-- Select Existing Resume --</option>
+      </select>
+      <span>or</span>
+      <input type="file" name="file" id="fileInput" />
+      <button type="submit">Upload New Resume</button>
     </form>
+    <div id="resumeStatus" class="output"></div>
 
     <form id="messageForm">
+      <input type="hidden" name="resume_id" id="resume_id" />
       <label>Message Type:</label>
       <select name="message_type" required>
         <option>Referral Request</option>
@@ -28,6 +89,8 @@
         <option>Friendly</option>
         <option>Enthusiastic</option>
       </select>
+      <label>Job Link (for referrals):</label>
+      <input type="text" name="job_link" placeholder="https://company.com/job-id"><br>
 
       <label>Target Profile (Optional):</label>
       <textarea name="target_profile" placeholder="Paste LinkedIn info here..."></textarea>
@@ -35,12 +98,59 @@
       <button type="submit">Generate Message</button>
     </form>
 
-    <div id="output" class="output"></div>
+    <div id="output-container">
+      <button id="copyBtn" title="Copy to clipboard" aria-label="Copy">
+        <!-- SVG copy icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" height="1.5em" viewBox="0 0 24 24" width="1.5em" style="vertical-align:middle;">
+          <rect fill="none" height="24" width="24"/>
+          <path d="M16,1H4c-1.1,0-2,0.9-2,2v14h2V3h12V1z M19,5H8c-1.1,0-2,0.9-2,2v14c0,1.1,0.9,2,2,2h11c1.1,0,2-0.9,2-2V7 C21,5.9,20.1,5,19,5z M19,21H8V7h11V21z"/>
+        </svg>
+      </button>
+      <div id="loader" style="display:none;margin:1em 0;">Generating message... <span class="spinner"></span></div>
+      <div id="output" class="output"></div>
+    </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
+    // Populate resume dropdown on load
+    async function loadResumeIds(selectedId) {
+      const res = await fetch("/resume-ids");
+      const resumes = await res.json();
+      const select = document.getElementById("resumeSelect");
+      select.innerHTML = '<option value="">-- Select Existing Resume --</option>';
+      resumes.forEach(r =>
+        select.innerHTML += `<option value="${r.id}" ${selectedId === r.id ? "selected" : ""}>${r.id.slice(0, 8)} - ${r.preview}</option>`
+      );
+      if (selectedId) document.getElementById("resume_id").value = selectedId;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadResumeIds();
+    });
+
+    document.getElementById("resumeSelect").onchange = function() {
+      const val = this.value;
+      document.getElementById("resume_id").value = val;
+      if (val) {
+        document.getElementById("resumeStatus").innerText = "Selected existing resume.";
+        document.getElementById("resumeStatus").style.color = "green";
+      } else {
+        document.getElementById("resumeStatus").innerText = "";
+      }
+    };
+
     document.getElementById("resumeForm").onsubmit = async (e) => {
       e.preventDefault();
+      const fileInput = document.getElementById("fileInput");
+      if (fileInput.files.length === 0) {
+        // No file selected, treat as resume selection
+        const resumeId = document.getElementById("resumeSelect").value;
+        document.getElementById("resume_id").value = resumeId;
+        document.getElementById("resumeStatus").innerText = "Selected existing resume.";
+        document.getElementById("resumeStatus").style.color = "green";
+        return;
+      }
       const form = e.target;
       const data = new FormData(form);
 
@@ -49,20 +159,71 @@
         body: data
       });
       const json = await res.json();
-      alert(json.message || json.error);
+      const statusDiv = document.getElementById("resumeStatus");
+      statusDiv.innerText = json.message || json.error;
+      statusDiv.style.color = json.error ? "red" : "green";
+      if (json.resume_id) {
+        loadResumeIds(json.resume_id); // Refresh list and select new resume
+      }
     };
 
     document.getElementById("messageForm").onsubmit = async (e) => {
       e.preventDefault();
       const form = e.target;
+      const resumeId = document.getElementById("resume_id").value;
+      const outputDiv = document.getElementById("output");
+      const copyBtn = document.getElementById("copyBtn");
+      const loader = document.getElementById("loader");
+      if (!resumeId) {
+        outputDiv.innerText = "Please select or upload your resume first.";
+        copyBtn.style.display = "none";
+        return;
+      }
+      outputDiv.innerHTML = "";
+      loader.style.display = "block";
+      copyBtn.style.display = "none";
       const data = new FormData(form);
 
+      // Use fetch with streaming
       const res = await fetch("/generate-message", {
         method: "POST",
         body: data
       });
-      const json = await res.json();
-      document.getElementById("output").innerText = json.message || json.error;
+
+      if (!res.body) {
+        loader.style.display = "none";
+        outputDiv.innerText = "No response from server.";
+        return;
+      }
+
+      const reader = res.body.getReader();
+      let received = "";
+      const decoder = new TextDecoder();
+
+      function appendAndRender(chunk) {
+        received += chunk;
+        
+        outputDiv.innerHTML = marked.parse(received);
+      }
+
+      // Read stream
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        appendAndRender(chunk);
+      }
+      loader.style.display = "none";
+      copyBtn.style.display = received.trim() ? "inline-block" : "none";
+    };
+
+    document.getElementById("copyBtn").onclick = () => {
+      const temp = document.createElement("textarea");
+      temp.value = document.getElementById("output").innerText;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand("copy");
+      document.body.removeChild(temp);
     };
   </script>
 </body>
